@@ -16,7 +16,22 @@ terraform {
 
   required_version = ">= 0.13"
 }
+# ================================================================
+# VULNERABLE TEST RESOURCE FOR FROGBOT IAC SCAN
+# ================================================================
+resource "aws_security_group" "vulnerable_example" {
+  name        = "allow_ssh_public"
+  description = "Allow SSH inbound traffic from everywhere"
 
+  ingress {
+    description = "SSH from VPC"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    # VIOLATION: Opening port 22 to the entire world (0.0.0.0/0)
+    cidr_blocks = ["0.0.0.0/0"] 
+  }
+}
 # ================================================================
 # Providers
 # ================================================================
@@ -24,15 +39,17 @@ terraform {
 # Artifactory provider
 provider "artifactory" {
   url           = "http://172.16.10.122/artifactory"
-  access_token  = "eyJ2ZXIiOiIyIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYiLCJraWQiOiJRTGRSQktKaDVxMUdxdDRpT1E2WWlaMU96Y0FQMV9FMEtpN05Td2R5SGNvIn0.eyJpc3MiOiJqZmZlQDAxanJ0OGc1dGEwYnFxMDY5ODNjMXMwdjFyIiwic3ViIjoiamZhY0AwMWpydDhnNXRhMGJxcTA2OTgzYzFzMHYxci91c2Vycy9hZG1pbiIsInNjcCI6ImFwcGxpZWQtcGVybWlzc2lvbnMvYWRtaW4iLCJhdWQiOiIqQCoiLCJpYXQiOjE3NjA1OTgzNDUsImp0aSI6ImY3MTU3MjQ3LWMwZGYtNDVlNS05MjRjLTg0Mzc0YTRjNzllYiJ9.BY1rQIGQ8DWrlyrRZoPVCLK9nR3gwNqy1LCHRsi7I5eO1nu1oO6JgClZWYqay4HWqI7fKIE6Ubkle-HPK8vRu_wNrFgFphYEqr3KT3dYSGIIZwcBMDkXpdiXkFUCdoONVP_gVG7ncA-QOPXM4DVqntC71cagn7zzc-dLd4ml9d_Oat7LrOuH2fkPG4M787GHYgIVtrbFX13GqY2_rzwbR96cFtNG-7ZGxB7Tqf2ILfPgKfvf1Q82lRFrHhOBwaVGoGCQjHj-3xyZ4Im4D6qgojEMw33f8tdjVb6KnmDH_hYmeCDKMxd7SPCzir3ZruiRFXKMBLvHA5QTKTqGD-bgGg"
+  access_token  = var.artifactory_access_token
 }
 
 # Xray provider
 provider "xray" {
   url           = "http://172.16.10.122/xray"
-  access_token  = "eyJ2ZXIiOiIyIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYiLCJraWQiOiJRTGRSQktKaDVxMUdxdDRpT1E2WWlaMU96Y0FQMV9FMEtpN05Td2R5SGNvIn0.eyJpc3MiOiJqZmZlQDAxanJ0OGc1dGEwYnFxMDY5ODNjMXMwdjFyIiwic3ViIjoiamZhY0AwMWpydDhnNXRhMGJxcTA2OTgzYzFzMHYxci91c2Vycy9hZG1pbiIsInNjcCI6ImFwcGxpZWQtcGVybWlzc2lvbnMvYWRtaW4iLCJhdWQiOiIqQCoiLCJpYXQiOjE3NjA1OTgzNDUsImp0aSI6ImY3MTU3MjQ3LWMwZGYtNDVlNS05MjRjLTg0Mzc0YTRjNzllYiJ9.BY1rQIGQ8DWrlyrRZoPVCLK9nR3gwNqy1LCHRsi7I5eO1nu1oO6JgClZWYqay4HWqI7fKIE6Ubkle-HPK8vRu_wNrFgFphYEqr3KT3dYSGIIZwcBMDkXpdiXkFUCdoONVP_gVG7ncA-QOPXM4DVqntC71cagn7zzc-dLd4ml9d_Oat7LrOuH2fkPG4M787GHYgIVtrbFX13GqY2_rzwbR96cFtNG-7ZGxB7Tqf2ILfPgKfvf1Q82lRFrHhOBwaVGoGCQjHj-3xyZ4Im4D6qgojEMw33f8tdjVb6KnmDH_hYmeCDKMxd7SPCzir3ZruiRFXKMBLvHA5QTKTqGD-bgGg"
+  access_token  = var.xray_access_token
 }
-
+provider "aws" {
+  region = "us-east-1"
+}
 # ================================================================
 # Artifactory repository example
 # ================================================================
